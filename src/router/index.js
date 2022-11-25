@@ -9,19 +9,15 @@ Vue.use(Router);
 
 export default new Router({
   routes:[
-    //登錄頁
+
     {
       //通过/login访问
       path:'/',
 
-      name:'Login',
-      component:Login
-    },
-    {
-      path:'/home',
-      name:"Home",
+      name:'Home',
       component:Home
     },
+
 
   ]
 })

@@ -1,55 +1,93 @@
 <template>
   <div id="building">
         <div class="login_title">
-          <h2>医疗记录系统</h2>
-          <h2>Medical Records System</h2>
+          <h1>Medical Records System</h1>
         </div>
 
     <el-tabs type="border-card" style="width: 90%;margin: auto">
-      <el-tab-pane label="创建记录">
+
+      <el-tab-pane label="All Records">
+
+        <el-button type="primary" icon="el-icon-search" @click="searchAll">search</el-button>
+
+        <el-table
+          :data="tableData1"
+          height="400"
+          border
+          stripe
+          style="width: 100%">
+          <el-table-column
+            prop="recordId"
+            label="Record ID">
+          </el-table-column>
+          <el-table-column
+            prop="name"
+            label="Patient Name"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="in_time"
+            label="Admission time"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="out_time"
+            label="Discharge time">
+          </el-table-column>
+          <el-table-column
+            prop="fee"
+            label="Fee">
+          </el-table-column>
+
+        </el-table>
+
+      </el-tab-pane>
+
+      <el-tab-pane label="Create Records">
 
         <el-form  :model="form" label-width="80px" style="width: 95%;margin: auto" :rules="formRules" ref="formRules" prop="form">
-          <el-form-item label="患者姓名" prop="PatientName">
+          <el-form-item label="Name" prop="PatientName">
             <el-input v-model="form.PatientName" ></el-input>
           </el-form-item>
-          <el-form-item label="住院时间" >
+          <el-form-item label="Time" >
             <el-col :span="11">
               <el-form-item label="" prop="In_time" >
-              <el-date-picker type="date" placeholder="选择日期" v-model="form.In_time" style="width: 100%;" ></el-date-picker>
+              <el-date-picker type="date" placeholder="choose the time" v-model="form.In_time" style="width: 100%;" format="yyyy-MM-dd"
+                              value-format="yyyy-MM-dd"></el-date-picker>
                 </el-form-item>
             </el-col>
             <el-col class="line" :span="2">-</el-col>
             <el-col :span="11">
               <el-form-item label="" prop="Out_time" >
-              <el-date-picker type="date" placeholder="选择日期" v-model="form.Out_time" style="width: 100%;" ></el-date-picker>
+              <el-date-picker type="date" placeholder="choose the time" v-model="form.Out_time" style="width: 100%;" format="yyyy-MM-dd" value-format="yyyy-MM-dd"></el-date-picker>
               </el-form-item>
             </el-col>
           </el-form-item>
-          <el-form-item label="费用" prop="Fee">
+          <el-form-item label="Fee" prop="Fee">
             <el-input v-model="form.Fee" ></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit" :disabled="this.GLOBAL.userAuth !== 1 ">创建</el-button>
+            <el-button type="primary" class="el-icon-upload el-icon--right" @click="onSubmit" >Upload</el-button>
           </el-form-item>
         </el-form>
 
 
       </el-tab-pane>
 
-      <el-tab-pane label="记录搜索">
+      <el-tab-pane label="Search record">
 
 
           <el-form style="width: 95%;margin: auto">
             <el-form-item lable="搜索" >
             <el-col :span="15">
               <el-form-item label="">
-                <el-input v-model="info" placeholder="请输入信息"></el-input>
+                <el-input v-model="searchForm.recordId" placeholder="please input"></el-input>
               </el-form-item>
             </el-col>
 
               <el-col :span="5">
           <el-form-item label="">
-          <el-select v-model="value" placeholder="请选择信息类型">
+          <el-select v-model="value" placeholder="please choose the search method">
             <el-option
               v-for="item in options"
               :key="item.value"
@@ -61,7 +99,7 @@
                 </el-col>
 
               <el-col :span="3">
-                <el-button type="primary" @click="search">搜索</el-button>
+                <el-button type="primary" icon="el-icon-search" @click="searchARecord">search</el-button>
               </el-col>
 
             </el-form-item>
@@ -75,26 +113,26 @@
           border
           style="width: 100%">
           <el-table-column
-            prop="PatientName"
-            label="患者姓名"
+            prop="name"
+            label="Patient Name"
            >
           </el-table-column>
           <el-table-column
-            prop="In_time"
-            label="入院时间"
+            prop="in_time"
+            label="Admission time"
             >
           </el-table-column>
           <el-table-column
-            prop="Out_time"
-            label="出院时间">
+            prop="out_time"
+            label="Discharge time">
           </el-table-column>
           <el-table-column
-            prop="Fee"
-            label="费用">
+            prop="fee"
+            label="Fee">
           </el-table-column>
           <el-table-column
-            prop="RecordId"
-            label="记录编号">
+            prop="createdBy"
+            label="Created by">
           </el-table-column>
         </el-table>
 
@@ -103,6 +141,9 @@
 
 
       </el-tab-pane>
+
+
+
 
     </el-tabs>
 
@@ -114,6 +155,7 @@
 export default {
   data() {
     return {
+      tableData1: [],
       form: {
         PatientName: '',
         In_time: '',
@@ -123,48 +165,47 @@ export default {
       formRules: {
         PatientName: [{
           required: true,
-          message: "请输入患者姓名",
+          message: "please input the name",
           trigger: "blur"
         },
           {
             min: 3,
             max: 18,
-            message: "长度在 3 到 18 个字符",
+            message: " 3 - 18 ",
             trigger: "blur",
           },
         ],
         In_time: [{
           required: true,
-          message: "请输入入院时间",
+          message: "please input the time",
           trigger: "blur"
         },
         ],
         Out_time: [{
           required: true,
-          message: "请输入出院时间",
+          message: "please input the time",
           trigger: "blur"
         },
 
         ],
         Fee: [{
           required: true,
-          message: "请输入费用",
+          message: "please input the fee",
           trigger: "blur"
         },
         ]
       },
       options: [{
         value: '1',
-        label: '患者姓名'
+        label: 'Ethereum'
       }, {
         value: '2',
-        label: '就医记录ID'
+        label: 'Hyperledger fabric'
       }, ],
       value: '',
       info:'',
       searchForm:{
-        Info:'',
-        Method:''
+        recordId:'',
       },
       tableData: [],
 
@@ -183,6 +224,25 @@ export default {
     }
   },
   methods: {
+    searchARecord(){
+      this.$axios.post("/api/search", this.qs.stringify(this.searchForm),{
+        headers:{
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      }).then((
+        res) => {
+        console.log(res)
+        if (res.status === 200) {
+          this.tableData = [];
+            this.tableData.push(res.data);
+            this.$message.success("success!")
+        }
+        else{
+          this.tableData = [];
+          this.$message.error("fail!");
+        }
+      })
+    },
     onSubmit() {
       this.$refs.formRules.validate((valid) => {
         const startDate = this.form.In_time
@@ -192,14 +252,18 @@ export default {
 
         if (!valid) return;
         if ( endTime < startTime) {
-          this.$message.error('结束日期必须大于开始日期，请重新选择！')
+          this.$message.error('The end date must be greater than the start date, please reselect!')
           return;
         }
-        this.$axios.post("/api/sendtx", this.qs.stringify(this.form)).then((
+        this.$axios.post("/api/create", this.qs.stringify(this.form),{
+          headers:{
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        }).then((
           res) => {
           console.log(res)
-          if (res.data.message === 'success send the record') {
-            this.$message.success("记录 id 为"+res.data.recordId);
+          if (res.status === 200) {
+            this.$message.success(res.data);
           }
           else{
             this.$message.error("创建失败，请重试");
@@ -207,17 +271,23 @@ export default {
         })
       })
     },
-    search(){
-      this.searchForm.Info = this.info
-      this.searchForm.Method = this.value
-      this.$axios.post("/api/query", this.qs.stringify(this.searchForm)).then((
+    searchAll(){
+      this.$axios.get("/api/query").then((
         res) => {
         console.log(res)
-        if (res.data.message === 'successful') {
-          this.tableData = res.data.record;
+        if (res.status === 200) {
+            this.tableData1 = [];
+          for(let i=0;i<res.data.length;i++)
+          {
+            let temp = res.data[i];
+            temp.Record.recordId = res.data[i].Key;
+            this.tableData1.push(res.data[i].Record);
+          }
+          this.$message.success("success!")
+
         }
         else{
-          this.$message.error("搜索失败");
+          this.$message.error("fail!");
         }
       })
     }
@@ -253,7 +323,7 @@ export default {
   box-shadow: 0 0 5px 2px #ddd;
 }
 #building{
-  background:url("../assets/back2.jpeg");
+  background:url("../assets/back.jpeg");
   width:100%;
   height:100%;
   position:fixed;
