@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "bent": "^7.3.12",
+    "form-urlencoded": "^6.1.0",
+    "web3": "^1.8.1",
+    "xhr2": "^0.2.1"
+  }
+}

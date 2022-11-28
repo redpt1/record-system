@@ -1,7 +1,7 @@
 <template>
   <div id="building">
         <div class="login_title">
-          <h1>Medical Records System</h1>
+          <h1>Medical Records System Fabric</h1>
         </div>
 
     <el-tabs type="border-card" style="width: 90%;margin: auto">
