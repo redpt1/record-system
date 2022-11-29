@@ -1,6 +1,3 @@
-/* express的服务器 */
-
-//1. 导入express
 var express = require('express')
 const FabricClient = require('./fabric/client.js');
 const client = new FabricClient();
@@ -10,24 +7,15 @@ const formurlencoded = require('form-urlencoded');
 const https = require('https');
 const fs = require('fs');
 
-
 var privateKey  = fs.readFileSync('key.pem', 'utf8');
 var certificate = fs.readFileSync('cert.pem', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 
-
-//2. 创建express服务器
 var app = express()
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 var httpsServer = https.createServer(credentials, app);
 
-
-
-
-//3. 访问服务器(get或者post)
-//参数一: 请求根路径
-//3.1 get请求
 app.get('/query', function (request, response) {
 
   var queryRequest = new Promise((resolve, reject) => {
@@ -92,8 +80,6 @@ const res=post('/get', formurlencoded(data), headers);
 
 });
 
-
-
 app.post('/search', function (request, response) {
 
   var searchRequest = new Promise((resolve, reject) => {
@@ -114,10 +100,6 @@ app.post('/search', function (request, response) {
   }
 );
 });
-
-
-
-
 
 var SSLPORT = 4040;
 httpsServer.listen(SSLPORT)
