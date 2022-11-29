@@ -1,5 +1,5 @@
 'use strict'
 module.exports = {
   NODE_ENV: '"production"',
-  API_HOST:"http://192.168.88.132:4040"
+  API_HOST:"https://10.11.136.1:4040"
 }
